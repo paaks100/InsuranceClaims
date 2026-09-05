@@ -1,0 +1,8 @@
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+**/bin
+**/obj
+
+claims.db*
