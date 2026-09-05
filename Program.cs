@@ -73,4 +73,11 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.MapControllers();
 
+// Health Check Endpoint for monitoring
+app.MapGet("/health", () => Results.Ok(new
+{
+    Status = "Healthy",
+    Timestamp = DateTimeOffset.UtcNow
+}));
+
 app.Run();
