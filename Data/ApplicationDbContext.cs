@@ -1,6 +1,7 @@
 ﻿using InsuranceClaims.Data.Seeds;
 using InsuranceClaims.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InsuranceClaims.Data;
 
@@ -23,6 +24,22 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<PolicyEntity>().HasData(policies);
         modelBuilder.Entity<ClaimEntity>().HasData(claims);
         modelBuilder.Entity<PaymentEntity>().HasData(payments);
+
+        var dateTimeOffsetConverter = new ValueConverter<DateTimeOffset, long>(
+            v => v.UtcDateTime.Ticks,
+            v => new DateTimeOffset(v, TimeSpan.Zero));
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        foreach (var property in entityType.GetProperties())
+        {
+            if (property.ClrType==typeof(DateTimeOffset))
+                property.SetValueConverter(dateTimeOffsetConverter);
+            
+            else if (property.ClrType == typeof(DateTimeOffset?))
+                property.SetValueConverter(new ValueConverter<DateTimeOffset?, long?>(
+                    v => v.HasValue ? v.Value.UtcDateTime.Ticks : null,
+                    v => v.HasValue ? new DateTimeOffset(v.Value, TimeSpan.Zero) : null));
+        }
     }
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
