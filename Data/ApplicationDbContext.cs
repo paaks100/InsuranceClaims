@@ -16,7 +16,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        
+
         var policies = SeedDataGenerator.GeneratePolicies();
         var claims = SeedDataGenerator.GenerateClaims(policies);
         var payments = SeedDataGenerator.GeneratePayments(claims);
@@ -32,16 +32,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         foreach (var property in entityType.GetProperties())
         {
-            if (property.ClrType==typeof(DateTimeOffset))
+            if (property.ClrType == typeof(DateTimeOffset))
                 property.SetValueConverter(dateTimeOffsetConverter);
-            
+
             else if (property.ClrType == typeof(DateTimeOffset?))
                 property.SetValueConverter(new ValueConverter<DateTimeOffset?, long?>(
                     v => v.HasValue ? v.Value.UtcDateTime.Ticks : null,
                     v => v.HasValue ? new DateTimeOffset(v.Value, TimeSpan.Zero) : null));
         }
     }
-    
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker.Entries<BaseEntity>();
