@@ -42,9 +42,11 @@ public static class SeedDataGenerator
 
             decimal estimated = rand.Next(1000, 150000);
 
-            decimal? approved = i % 4 == 0
-                ? null
-                : Math.Round(estimated * (decimal)(0.65 + rand.NextDouble() * 0.35), 2);
+            decimal? approved = i % 10 == 0
+                ? 0
+                : i % 4 == 0
+                    ? null
+                    : Math.Round(estimated * (decimal)(0.65 + rand.NextDouble() * 0.35), 2);
 
             var lossDate = BaseDate.AddDays(-rand.Next(10, 300));
             
